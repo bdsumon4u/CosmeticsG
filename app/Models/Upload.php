@@ -11,6 +11,13 @@ class Upload extends Model
     use SoftDeletes;
 
     /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
+
+    /**
     * The attributes that are mass assignable.
     *
     * @var array

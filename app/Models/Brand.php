@@ -9,6 +9,12 @@ use App;
 
 class Brand extends Model
 {
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
 
     protected $with = ['brand_translations'];
     protected $fillable = ['name', 'logo', 'slug', 'meta_title', 'meta_description'];

@@ -10,6 +10,13 @@ class ProductCategory extends Model
 {
     use HasFactory;
 
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
+
     public function product()
     {
         return $this->belongsTo(Product::class);

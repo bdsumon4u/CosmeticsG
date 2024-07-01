@@ -8,7 +8,13 @@ use App\Traits\PreventDemoModeChanges;
 
 class Product extends Model
 {
-    
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
+
     protected $guarded = ['choice_attributes'];
 
     protected $with = ['product_translations', 'taxes', 'thumbnail'];

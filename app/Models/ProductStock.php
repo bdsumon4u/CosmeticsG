@@ -7,6 +7,12 @@ use App\Traits\PreventDemoModeChanges;
 
 class ProductStock extends Model
 {
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
 
     protected $fillable = ['product_id', 'variant', 'sku', 'price', 'qty', 'image'];
     //

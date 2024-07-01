@@ -3,7 +3,38 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Middleware\EnsureSystemKey;
+use App\Models\Order;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+Route::post('status-update', function (Request $request) {
+    if ($request->header('X-PATHAO-Signature') != 'paikeari') {
+        return;
+    }
+
+    if (!$order = Order::where('code', $request->merchant_order_id)->orWhere('shipping_address->pathao->consignment_id', $request->consignment_id)->first()) return;
+
+    $courier = $request->only([
+        'consignment_id',
+        'order_status',
+        'reason',
+        'invoice_id',
+        'payment_status',
+        'collected_amount',
+    ]);
+    $order->forceFill(['shipping_address->pathao' => $courier]);
+
+    if ($request->order_status_slug == 'Pickup_Cancelled') {
+        $order->delivery_status = 'cancelled';
+    }
+    if ($request->order_status_slug == 'Delivered') {
+        $order->delivery_status = 'delivered';
+    }
+    if ($request->order_status_slug == 'Payment_Invoice') {
+        $order->payment_status = 'paid';
+    }
+    $order->save();
+});
 
 Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function () {
     Route::post('login', [AuthController::class, 'login']);

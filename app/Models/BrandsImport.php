@@ -12,6 +12,12 @@ use Illuminate\Support\Str;
 //class ProductsImport implements ToModel, WithHeadingRow, WithValidation
 class BrandsImport implements ToCollection, WithHeadingRow, ToModel
 {
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
 
     private $rows = 0;
 

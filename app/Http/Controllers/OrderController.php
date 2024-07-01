@@ -147,6 +147,7 @@ class OrderController extends Controller
 
         $shippingAddress = [];
         if ($address != null) {
+            $shippingAddress['address_id']  = $address->id;
             $shippingAddress['name']        = Auth::user()->name;
             $shippingAddress['email']       = Auth::user()->email;
             $shippingAddress['address']     = $address->address;
@@ -356,6 +357,69 @@ class OrderController extends Controller
         return 1;
     }
 
+    public function book_in_pathao(Request $request)
+    {
+        if (!$request->id) return 0;
+
+
+        $response = ['status' => 'success', 'message' => 'Booked in Pathao'];
+        foreach (Order::find($request->id) as $order) {
+            try {
+                $this->pathao($order);
+            } catch (\App\Pathao\Exceptions\PathaoException $e) {
+                $errors = collect($e->errors)->values()->flatten()->toArray();
+                $response = ['status' => 'failed', 'message' => $order->invoiceID . ': ' . ($errors[0] ?? $e->getMessage())];
+            } catch (\Exception $e) {
+                $response = ['status' => 'failed', 'message' => $order->invoiceID . ': ' . $e->getMessage()];
+            }
+        }
+
+        return json_encode($response);
+    }
+
+    private function pathao(Order $order)
+    {
+        $shipping = json_decode($order->shipping_address, true);
+
+        if ($consignment_id = $shipping['pathao']['consignment_id'] ?? null) {
+            $details = \App\Pathao\Facade\Pathao::order()->orderDetails($consignment_id);
+            if ($details->order_status != 'Pickup Cancel') return;
+        }
+
+        $address = Address::find($shipping['address_id']);
+        if (!$address) return;
+
+        $data = [
+            "store_id"            => "87563", // Find in store list,
+            "merchant_order_id"   => $order->code, // Unique order id
+            "recipient_name"      => $shipping['name'], // Customer name
+            "recipient_phone"     => preg_replace('/[^0-9]/', '', $shipping['phone']),
+            "recipient_address"   => $shipping['address'], // Customer address
+            "recipient_city"      => $address->state_id, // Find in city method
+            "recipient_zone"      => $address->city_id, // Find in zone method
+            // "recipient_area"      => "", // Find in Area method
+            "delivery_type"       => 48, // 48 for normal delivery or 12 for on demand delivery
+            "item_type"           => 2, // 1 for document, 2 for parcel
+            // "special_instruction" => "",
+            "item_quantity"       => 1, // item quantity
+            "item_weight"         => 0.5, // parcel weight
+            "amount_to_collect"   => (int)round($order->grand_total), // - $order->deliveryCharge, // amount to collect
+            // "item_description"    => $this->getProductsDetails($order->id), // product details
+        ];
+
+        $data = \App\Pathao\Facade\Pathao::order()->create($data);
+
+        $courier = collect(json_decode(json_encode($data), true))->only([
+            'consignment_id',
+            'order_status',
+            'reason',
+            'invoice_id',
+            'payment_status',
+            'collected_amount',
+        ])->all();
+        $order->forceFill(['shipping_address->pathao' => $courier])->save();
+    }
+
     public function order_details(Request $request)
     {
         $order = Order::findOrFail($request->order_id);
@@ -369,6 +433,10 @@ class OrderController extends Controller
         $order->delivery_viewed = '0';
         $order->delivery_status = $request->status;
         $order->save();
+
+        if ($order->delivery_status == 'picked_up') {
+            $this->pathao($order);
+        }
 
         if ($request->status == 'cancelled' && $order->payment_type == 'wallet') {
             $user = User::where('id', $order->user_id)->first();

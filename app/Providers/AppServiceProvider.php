@@ -17,6 +17,14 @@ class AppServiceProvider extends ServiceProvider
   {
       Schema::defaultStringLength(191);
       Paginator::useBootstrap();
+
+      $this->app->bind("pathao", function () {
+        return new \App\Pathao\Manage\Manage(
+          new \App\Pathao\Apis\AreaApi(),
+          new \App\Pathao\Apis\StoreApi(),
+          new \App\Pathao\Apis\OrderApi()
+        );
+      });
   }
 
   /**

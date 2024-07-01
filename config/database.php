@@ -54,6 +54,21 @@ return [
             'engine' => null,
         ],
 
+        'oninda' => [
+            'driver' => 'mysql',
+            'host' => env('DB_ONINHOST', '127.0.0.1'),
+            'port' => env('DB_ONINPORT', '3306'),
+            'database' => env('DB_ONINDB', 'forge'),
+            'username' => env('DB_ONINUSER', 'forge'),
+            'password' => env('DB_ONINPASS', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '127.0.0.1'),

@@ -8,6 +8,12 @@ use App;
 
 class Attribute extends Model
 {
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
 
     protected $with = ['attribute_translations'];
 

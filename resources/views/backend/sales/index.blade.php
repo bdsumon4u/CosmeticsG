@@ -20,6 +20,7 @@
                             @can('export_order')
                                 <a class="dropdown-item" href="javascript:void(0)" onclick="order_bulk_export()">{{ translate('Export') }}</a>
                             @endcan
+                            <a class="dropdown-item" href="#" onclick="pathao()"> {{translate('Book in Pathao')}}</a>
                         </div>
                     </div>
                 @endcan
@@ -95,7 +96,7 @@
                             <th>{{ translate('Order Code') }}</th>
                             <th data-breakpoints="md">{{ translate('Num. of Products') }}</th>
                             <th data-breakpoints="md">{{ translate('Customer') }}</th>
-                            <th data-breakpoints="md">{{ translate('Seller') }}</th>
+                            <th data-breakpoints="md">{{ translate('Pathao') }}</th>
                             <th data-breakpoints="md">{{ translate('Amount') }}</th>
                             <th data-breakpoints="md">{{ translate('Delivery Status') }}</th>
                             <th data-breakpoints="md">{{ translate('Payment method') }}</th>
@@ -144,10 +145,12 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ($order->shop)
-                                        {{ $order->shop->name }}
-                                    @else
-                                        {{ translate('Inhouse Order') }}
+                                    @if($pathao = json_decode($order->shipping_address)->pathao ?? null)
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach($pathao as $key => $val)
+                                            <li><strong>{{$key}}</strong>:&nbsp;<span>{{$val}}</span></li>
+                                            @endforeach
+                                        </ul>
                                     @endif
                                 </td>
                                 <td>
@@ -276,6 +279,27 @@
             $("#sort_orders").attr("action", url);
             $('#sort_orders').submit();
             $("#sort_orders").attr("action", '');
+        }
+
+        function pathao() {
+            var data = new FormData($('#sort_orders')[0]);
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "{{route('book-in-pathao')}}",
+                type: 'POST',
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    response = JSON.parse(response);
+                    if(response.status == 'success') {
+                        location.reload();
+                    }
+                }
+            });
         }
     </script>
 @endsection

@@ -26,6 +26,12 @@ use App\Traits\PreventDemoModeChanges;
 
 class SubCategory extends Model
 {
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'oninda';
 
 
     public function category()

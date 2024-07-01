@@ -47,6 +47,7 @@ class OrderController extends Controller
         $address = Address::where('id', $cartItems->first()->address_id)->first();
         $shippingAddress = [];
         if ($address != null) {
+            $shippingAddress['address_id']  = $address->id;
             $shippingAddress['name']        = $user->name;
             $shippingAddress['email']       = $user->email;
             $shippingAddress['address']     = $address->address;

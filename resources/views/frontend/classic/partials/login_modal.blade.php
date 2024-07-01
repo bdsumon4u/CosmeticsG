@@ -35,7 +35,7 @@
                                 @endif
                             </div>
                             <!-- Use Email Instead -->
-                            <div class="form-group text-right">
+                            <div class="form-group text-right d-none">
                                 <button class="btn btn-link p-0 text-primary" type="button"
                                     onclick="toggleEmailPhone(this)"><i>*{{ translate('Use Email Instead') }}</i></button>
                             </div>

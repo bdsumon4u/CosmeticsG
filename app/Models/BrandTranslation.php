@@ -7,6 +7,12 @@ use App\Traits\PreventDemoModeChanges;
 
 class BrandTranslation extends Model
 {
+  /**
+   * The connection name for the model.
+   *
+   * @var string|null
+   */
+  protected $connection = 'oninda';
 
   protected $fillable = ['name', 'lang', 'brand_id'];
 
