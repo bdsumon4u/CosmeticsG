@@ -59,7 +59,7 @@
                                                 @endif
                                             </div>
 
-                                            <div class="form-group text-right">
+                                            <div class="form-group text-right d-none">
                                                 <button class="btn btn-link p-0 text-primary fs-12 fw-400" type="button" onclick="toggleEmailPhone(this)"><i>*{{ translate('Use Email Instead') }}</i></button>
                                             </div>
                                         @else
