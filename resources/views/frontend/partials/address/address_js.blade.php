@@ -1,5 +1,12 @@
 <script type="text/javascript">
-
+    $(document).on('keyup', '[name="address"]', function (ev) {
+        var key = ev.keyCode || ev.charCode;
+        if (key == 8 || key == 46) {
+            return true;
+        }
+        
+        $(this).val($(this).val().replace(/[^a-zA-Z0-9\s\-,\.]/g, ''));
+    });
     function submitShippingInfoForm(el) {
         var email = $("input[name='email']").val();
         var phone = $("input[name='country_code']").val()+$("input[name='phone']").val();
